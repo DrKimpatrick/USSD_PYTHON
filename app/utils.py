@@ -2,10 +2,25 @@ from flask import make_response
 from run import db
 from .models import User, SessionLevel
 
+
 def respond(menu_text):
     response = make_response(menu_text, 200)
     response.headers['Content-Type'] = "text/plain"
     return response
+
+
+def check_pin(pin):
+    # check if pin matches the required specifications
+    # pin should be 4 integer characters long
+    response = "CON Invalid Pin. \n"
+    response += "Pin should be 4 interger characters long"
+    if len(pin) == 4:
+        try:
+            pin = int(pin)
+        except:
+            return respond(response)
+    else:
+        return respond(response)
 
 
 class RegisterUser:
@@ -81,7 +96,14 @@ class RegisterUser:
         return respond(response)
 
     def get_pin(self):
-        # insert in and then request for >>>>>>>>>
+        # insert in and then request a confirmatory in
+
+        # check if pin matches the required specifications
+        pin = self.optional_param
+        
+        if check_pin(pin):
+            return check_pin(pin)
+
         user = User.query.filter_by(phone_number=self.phone_number).first()
         user.pin = self.optional_param
 
@@ -100,7 +122,7 @@ class RegisterUser:
         return respond(response)
     
     def confirm_pin(self):
-        # insert in and then request for >>>>>>>>>
+        # insert in and then promote user to level 10
         user = User.query.filter_by(phone_number=self.phone_number).first()
         
         # compare the old pin and current
@@ -113,14 +135,16 @@ class RegisterUser:
 
             return respond(response)
 
+        
         # if Pins really match
-        session_level.is_pin_confirmed = True
-        db.session.add(session_level)
+        user.is_pin_confirmed = True
+        db.session.add(user)
         db.session.commit()
 
         # promote user to level 10
         session_level = SessionLevel.query.filter_by(
             session_id=self.session_id).first()
+
         session_level.promote_level(10)
         db.session.add(session_level)
         db.session.commit()
