@@ -110,8 +110,11 @@ class UssdCallback(Resource):
     def post(self):
         """ Method that handles responses from customers"""
 
+        # session_id = '078778877737vgfbbyy23jgb'
         session_id = request.values.get("sessionId", None)
         serviceCode = request.values.get("serviceCode", None)
+        
+        # phone_number = '07877887347766'
         phone_number = request.values.get("phoneNumber", None)
         text = request.values.get("text", "default")
 
@@ -127,14 +130,16 @@ class UssdCallback(Resource):
             session_level = SessionLevel.query.filter_by(
                 session_id=session_id).first()
 
-            level = session_level.level
-
             # Handling user registration
 
             if not user.pin:
                 # user does not have pin set
 
-                if session_level.session_id == session_id:
+                # check if session_id exists in sessionLevel table
+                if session_level:
+
+                    level = session_level.level
+
                     if level < 10:
                         menu = RegisterUser(
                             phone_number, session_id, user_response)
@@ -155,12 +160,10 @@ class UssdCallback(Resource):
                         # demote user to level 0
 
                         # also insert phone number and session_id to the sessionLevel table
-                        user = SessionLevel(
-                            phone_number=self.phone_number, session_id=self.session_id)
+                        session_level = SessionLevel(
+                            phone_number=phone_number, session_id=session_id)
 
-                        session_level.demote_level()
                         db.session.add(session_level)
-                        db.session.add(user)
                         db.session.commit()
 
                         return respond(response)
@@ -172,12 +175,10 @@ class UssdCallback(Resource):
                         # promote user to level 1
 
                         # also insert phone number and session_id to the sessionLevel table
-                        user = SessionLevel(
-                            phone_number=self.phone_number, session_id=self.session_id, level=1)
+                        session_level = SessionLevel(
+                            phone_number=phone_number, session_id=session_id, level=1)
 
-                        session_level.promote_level(1)
                         db.session.add(session_level)
-                        db.session.add(user)
                         db.session.commit()
 
                         return respond(response)
@@ -188,12 +189,10 @@ class UssdCallback(Resource):
                         # promote user to level 2
 
                         # also insert phone number and session_id to the sessionLevel table
-                        user = SessionLevel(
-                            phone_number=self.phone_number, session_id=self.session_id, level=2)
+                        session_level = SessionLevel(
+                            phone_number=phone_number, session_id=session_id, level=2)
 
-                        session_level.promote_level(2)
                         db.session.add(session_level)
-                        db.session.add(user)
                         db.session.commit()
 
                         # respond to user
