@@ -185,14 +185,15 @@ class UssdCallback(Resource):
 
             level = session_level.level
 
-            if level < 10:
-                menu = RegisterUser(phone_number, session_id, user_response)
-                if level == 0:   
-                    return menu.get_name() # enter city
-                elif level == 1:
-                    return menu.get_city() # enter pin
-                elif level == 2:
-                    return menu.get_pin() # promoted to level 10
+            if not user.pin:
+                if level < 10:
+                    menu = RegisterUser(phone_number, session_id, user_response)
+                    if level == 0:   
+                        return menu.get_name() # enter city
+                    elif level == 1:
+                        return menu.get_city() # enter pin
+                    elif level == 2:
+                        return menu.get_pin() # promoted to level 10
             else:
                 return respond("END you are at level 10 now")
         else:
