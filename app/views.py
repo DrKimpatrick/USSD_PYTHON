@@ -123,8 +123,15 @@ class UssdCallback(Resource):
                         return respond(response)
 
             else:
-                # Tell user to confirm their pin
-                return respond("END you are at level 10 now")
+                response = "CON 1. Deposit \n"
+                response += "2. Withdraw \n"
+                response += "3. Balance \n"
+                response += "4. Debt \n"
+                response += "5. Get loan \n"
+                response += "6. Pay loan \n"
+                response += "7. Account information"
+
+                return respond(response)
         else:
             menu = RegisterUser(phone_number, session_id)
             return menu.get_phone()  # enter name

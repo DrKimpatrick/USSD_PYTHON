@@ -149,5 +149,8 @@ class RegisterUser:
         db.session.add(session_level)
         db.session.commit()
 
-        response = "END Promoted to level 10"
+        response = "END Your account has been \n"
+        response += "successfully setup. You can \n"
+        response += "now save with us and even \n"
+        response += "get an instant loan"
         return respond(response)
