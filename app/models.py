@@ -12,6 +12,7 @@ class User(db.Model):
     city = db.Column(db.String(64))
     registration_date = db.Column(db.DateTime(), default=datetime.utcnow)
     pin = db.Column(db.String(128))
+    is_pin_confirmed = db.Column(db.Boolean(), default=False)
     account = db.Column(db.Integer, default=10)
 
     @property

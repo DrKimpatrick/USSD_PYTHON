@@ -88,6 +88,36 @@ class RegisterUser:
         db.session.add(user)
         db.session.commit()
 
+        # promote user to level 3
+        session_level = SessionLevel.query.filter_by(
+            session_id=self.session_id).first()
+        session_level.promote_level(3)
+        db.session.add(session_level)
+        db.session.commit()
+
+        response = "CON Please re-enter your Pin \n"
+        response += "to confirm it"
+        return respond(response)
+    
+    def confirm_pin(self):
+        # insert in and then request for >>>>>>>>>
+        user = User.query.filter_by(phone_number=self.phone_number).first()
+        
+        # compare the old pin and current
+        if user.pin != self.optional_param:
+            response = "CON Pin does not match \n"
+            response += "the existing Pin \n"
+            response += "Consider resetting it if \n"
+            response += "if you don't rember it. \n"
+            response += "Try again"
+
+            return respond(response)
+
+        # if Pins really match
+        session_level.is_pin_confirmed = True
+        db.session.add(session_level)
+        db.session.commit()
+
         # promote user to level 10
         session_level = SessionLevel.query.filter_by(
             session_id=self.session_id).first()

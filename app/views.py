@@ -35,8 +35,8 @@ class UssdCallback(Resource):
 
             # Handling user registration
 
-            if not user.pin:
-                # user does not have pin set
+            if not user.pin or not user.is_pin_confirmed:
+                # user does not have pin set or if pin is not confirmed
 
                 # check if session_id exists in sessionLevel table
                 if session_level:
@@ -51,7 +51,10 @@ class UssdCallback(Resource):
                         if level == 1:
                             return menu.get_city()  # enter pin
                         if level == 2:
-                            return menu.get_pin()  # promoted to level 10
+                            return menu.get_pin()  # promoted to level 3
+                        if level == 3:
+                            # confirm pin
+                            return menu.confirm_pin()  # promoted to level 10
                 else:
                     # After promoting user registration | is done in the if statement above
                     # This is because a new the session will be the same
@@ -106,7 +109,21 @@ class UssdCallback(Resource):
 
                         return respond(response)
 
+                    # if user has pin but is not confirmed
+                    if not user.is_pin_confirmed:
+                        # also insert phone number and session_id to the sessionLevel table
+                        session_level = SessionLevel(
+                            phone_number=phone_number, session_id=session_id, level=3)
+
+                        db.session.add(session_level)
+                        db.session.commit()
+
+                        response = "CON Please re-enter your Pin \n"
+                        response += "to confirm it"
+                        return respond(response)
+
             else:
+                # Tell user to confirm their pin
                 return respond("END you are at level 10 now")
         else:
             menu = RegisterUser(phone_number, session_id)
