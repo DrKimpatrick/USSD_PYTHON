@@ -4,7 +4,6 @@ from run import db
 
 
 class User(db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
 
@@ -12,7 +11,7 @@ class User(db.Model):
 
     city = db.Column(db.String(64))
     registration_date = db.Column(db.DateTime(), default=datetime.utcnow)
-    password_hash = db.Column(db.String(128))
+    pip = db.Column(db.String(128))
     account = db.Column(db.Integer, default=10)
 
     @property
@@ -21,10 +20,10 @@ class User(db.Model):
 
     @password.setter
     def password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.pip = generate_password_hash(password)
 
     def verify_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.pip, password)
 
     def __repr__(self):
         return "User {}".format(self.name)
@@ -37,7 +36,6 @@ class User(db.Model):
 
 
 class SessionLevel(db.Model):
-    __tablename__ = 'session_levels'
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.String(128), unique=True)
     phone_number = db.Column(db.String(25))
