@@ -49,8 +49,10 @@ class User(db.Model):
 class SessionLevel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     session_id = db.Column(db.String(128), unique=True)
-    phone_number = db.Column(db.String(25))
+    phone_number = db.Column(db.String(64), unique=True,
+                             index=True, nullable=False)
     level = db.Column(db.Integer, default=0)
+    date_created = db.Column(db.DateTime(), default=datetime.utcnow)
 
     def promote_level(self, level=1):
         self.level = level
