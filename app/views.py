@@ -15,8 +15,8 @@ class UssdCallback(Resource):
 
         # session_id = '078778877737v3g44fbbyy23jgb4r5665h'
         session_id = request.values.get("sessionId", None)
-        serviceCode = request.values.get("serviceCode", None)
-        
+        service_code = request.values.get("serviceCode", None)
+
         # phone_number = '078778445457'
         phone_number = request.values.get("phoneNumber", None)
         text = request.values.get("text", "default")
@@ -123,15 +123,55 @@ class UssdCallback(Resource):
                         return respond(response)
 
             else:
-                response = "CON 1. Deposit \n"
-                response += "2. Withdraw \n"
-                response += "3. Balance \n"
-                response += "4. Debt \n"
-                response += "5. Get loan \n"
-                response += "6. Pay loan \n"
-                response += "7. Account information"
+                session = SessionLevel.query.filter_by(
+                    phone_number=phone_number).first()
 
-                return respond(response)
+                if session.session_id != session_id:
+
+                    # This is the 1st time encouter under this section
+                    # We don't expect the session_id to match becauxe the last operation
+                    # killed the session | Here  we start with a new session_id
+                    session.session_id = session_id
+                    # Also promote to level 11
+                    session.promote_level(11)
+                    db.session.add(session)
+                    db.session.commit()
+
+                    # Now tell the user to enter their pin to continue
+                    response = "CON Please enter your pin to verify it is you"
+                    return respond(response)
+
+                if session.level == 11:
+                    # Start by verifying that the pin is right
+                    if user.pin != user_response:
+                        response = "CON Please enter correct PIN"
+                        return respond(response)
+
+                    # Now that the user has provided the right pin lets
+                    # Promote the user to level 12 plus the response
+                    session.session_id = session_id
+                    session.promote_level(12)
+                    db.session.add(session)
+                    db.session.commit()
+
+                    response = "CON 1. Deposit \n"
+                    response += "2. Withdraw \n"
+                    response += "3. Balance \n"
+                    response += "4. Debt \n"
+                    response += "5. Get loan \n"
+                    response += "6. Pay loan \n"
+                    response += "7. Account information"
+
+                    return respond(response)
+
+                if session.level == 12:
+                    session.session_id = session_id
+                    db.session.add(session)
+                    db.session.commit()
+                    
+                    response = "CON Congz You are on level 12"
+                    return respond(response)
+
         else:
             menu = RegisterUser(phone_number, session_id)
             return menu.get_phone()  # enter name
