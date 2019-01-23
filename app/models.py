@@ -14,7 +14,7 @@ class User(db.Model):
     registration_date = db.Column(db.DateTime(), default=datetime.utcnow)
     pin = db.Column(db.String(128))
     is_pin_confirmed = db.Column(db.Boolean(), default=False)
-    account_balance = db.Column(db.Integer, default=10)
+    account_balance = db.Column(db.Integer, default=0)
 
     @property
     def password(self):
