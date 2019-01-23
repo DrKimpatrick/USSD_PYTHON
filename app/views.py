@@ -13,14 +13,21 @@ class UssdCallback(Resource):
     def post(self):
         """ Method that handles responses from customers"""
 
-        # session_id = '078778877737v3g44fbbyy23jgb4r5665h'
-        session_id = request.values.get("sessionId", None)
-        serviceCode = request.values.get("serviceCode", None)
+        # # session_id = '078778877737v3g44fbbyy23jgb4r5665h'
+        # session_id = request.values.get("sessionId", None)
+        # serviceCode = request.values.get("serviceCode", None)
         
-        # phone_number = '078778445457'
-        phone_number = request.values.get("phoneNumber", None)
-        text = request.values.get("text", "default")
+        # # phone_number = '078778445457'
+        # phone_number = request.values.get("phoneNumber", None)
+        # text = request.values.get("text", "default")
 
+        # text_array = text.split("*")
+        # user_response = text_array[len(text_array) - 1]
+
+        session_id = request.json['sessionId']
+        serviceCode = request.json['sessionId']
+        phone_number = request.json['phone_number']
+        text = request.json['text']
         text_array = text.split("*")
         user_response = text_array[len(text_array) - 1]
 

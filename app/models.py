@@ -7,13 +7,14 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
 
-    phone_number = db.Column(db.String(64), unique=True, index=True, nullable=False)
+    phone_number = db.Column(db.String(64), unique=True,
+                             index=True, nullable=False)
 
     city = db.Column(db.String(64))
     registration_date = db.Column(db.DateTime(), default=datetime.utcnow)
     pin = db.Column(db.String(128))
     is_pin_confirmed = db.Column(db.Boolean(), default=False)
-    account = db.Column(db.Integer, default=10)
+    account_balance = db.Column(db.Integer, default=10)
 
     @property
     def password(self):
@@ -30,10 +31,19 @@ class User(db.Model):
         return "User {}".format(self.name)
 
     def deposit(self, amount):
-        self.account += amount
+        self.account_balance += amount
 
     def withdraw(self, amount):
-        self.account -= amount
+        self.account_balance -= amount
+
+    def account_info(self):
+        return {
+            'name': self.name,
+            'city': self.city,
+            'phone_number': self.phone_number,
+            'registration date': self.registration_date,
+            'account balance': self.account_balance
+        }
 
 
 class SessionLevel(db.Model):
@@ -47,5 +57,3 @@ class SessionLevel(db.Model):
 
     def demote_level(self):
         self.level = 0
-
-
