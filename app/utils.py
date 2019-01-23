@@ -39,15 +39,18 @@ class RegisterUser:
 
     def get_phone(self):
         # insert the phone number and then request for the name
-        new_user = User(phone_number=self.phone_number)
+        user = User.query.filter_by(phone_number=self.phone_number).first()
 
-        # also insert phone number and session_id to the sessionLevel table
-        user = SessionLevel(phone_number=self.phone_number,
-                            session_id=self.session_id)
+        if not user:
+            new_user = User(phone_number=self.phone_number)
+            db.session.add(new_user)
 
-        db.session.add(new_user)
-        db.session.add(user)
-        db.session.commit()
+            # also insert phone number and session_id to the sessionLevel table
+            session = SessionLevel(phone_number=self.phone_number,
+                                session_id=self.session_id)
+
+            db.session.add(session)
+            db.session.commit()
 
         response = "CON Please enter your name"
         return respond(response)
@@ -63,7 +66,7 @@ class RegisterUser:
 
         # Promote session level to 1
         session_level = SessionLevel.query.filter_by(
-            session_id=self.session_id).first()
+            phone_number=self.phone_number).first()
         session_level.promote_level(1)  # default is 1
         db.session.add(session_level)
         db.session.commit()
@@ -82,7 +85,7 @@ class RegisterUser:
 
         # promote user to level 2
         session_level = SessionLevel.query.filter_by(
-            session_id=self.session_id).first()
+            phone_number=self.phone_number).first()
         session_level.promote_level(2)
         db.session.add(session_level)
         db.session.commit()
@@ -100,7 +103,7 @@ class RegisterUser:
 
         # check if pin matches the required specifications
         pin = self.optional_param
-        
+
         if check_pin(pin):
             return check_pin(pin)
 
@@ -112,7 +115,7 @@ class RegisterUser:
 
         # promote user to level 3
         session_level = SessionLevel.query.filter_by(
-            session_id=self.session_id).first()
+            phone_number=self.phone_number).first()
         session_level.promote_level(3)
         db.session.add(session_level)
         db.session.commit()
@@ -120,11 +123,11 @@ class RegisterUser:
         response = "CON Please re-enter your Pin \n"
         response += "to confirm it"
         return respond(response)
-    
+
     def confirm_pin(self):
         # insert in and then promote user to level 10
         user = User.query.filter_by(phone_number=self.phone_number).first()
-        
+
         # compare the old pin and current
         if user.pin != self.optional_param:
             response = "CON Pin does not match \n"
@@ -135,7 +138,6 @@ class RegisterUser:
 
             return respond(response)
 
-        
         # if Pins really match
         user.is_pin_confirmed = True
         db.session.add(user)
@@ -143,7 +145,7 @@ class RegisterUser:
 
         # promote user to level 10
         session_level = SessionLevel.query.filter_by(
-            session_id=self.session_id).first()
+            phone_number=self.phone_number).first()
 
         session_level.promote_level(10)
         db.session.add(session_level)

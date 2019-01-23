@@ -24,7 +24,7 @@ class UssdCallback(Resource):
         text_array = text.split("*")
         user_response = text_array[len(text_array) - 1]
 
-        # This is data from Africastalking API
+        # # This is data from Africastalking API
         # session_id = request.json['sessionId']
         # serviceCode = request.json['sessionId']
         # phone_number = request.json['phone_number']
@@ -60,6 +60,8 @@ class UssdCallback(Resource):
                     if level == 0:
                         return menu.get_name()  # enter city
                     if level == 1:
+                        if not user.name:
+                            # Demote user to level 0
                         return menu.get_city()  # enter pin
                     if level == 2:
                         return menu.get_pin()  # promoted to level 3
