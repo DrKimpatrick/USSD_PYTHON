@@ -66,9 +66,10 @@ class UssdCallback(Resource):
                         # demote user to level 0
 
                         # also insert phone number and session_id to the sessionLevel table
-                        session_level = SessionLevel(
-                            phone_number=phone_number, session_id=session_id)
 
+                        session_level = SessionLevel.query.filter_by(
+                            phone_number=phone_number).first()
+                        session_level.session_id = session_id
                         db.session.add(session_level)
                         db.session.commit()
 
@@ -81,9 +82,10 @@ class UssdCallback(Resource):
                         # promote user to level 1
 
                         # also insert phone number and session_id to the sessionLevel table
-                        session_level = SessionLevel(
-                            phone_number=phone_number, session_id=session_id, level=1)
 
+                        session_level = SessionLevel.query.filter_by(
+                            phone_number=phone_number).first()
+                        session_level.session_id = session_id
                         db.session.add(session_level)
                         db.session.commit()
 
@@ -95,9 +97,10 @@ class UssdCallback(Resource):
                         # promote user to level 2
 
                         # also insert phone number and session_id to the sessionLevel table
-                        session_level = SessionLevel(
-                            phone_number=phone_number, session_id=session_id, level=2)
 
+                        session_level = SessionLevel.query.filter_by(
+                            phone_number=phone_number).first()
+                        session_level.session_id = session_id
                         db.session.add(session_level)
                         db.session.commit()
 
@@ -112,9 +115,10 @@ class UssdCallback(Resource):
                     # if user has pin but is not confirmed
                     if not user.is_pin_confirmed:
                         # also insert phone number and session_id to the sessionLevel table
-                        session_level = SessionLevel(
-                            phone_number=phone_number, session_id=session_id, level=3)
 
+                        session_level = SessionLevel.query.filter_by(
+                            phone_number=phone_number).first()
+                        session_level.session_id = session_id
                         db.session.add(session_level)
                         db.session.commit()
 
@@ -168,7 +172,7 @@ class UssdCallback(Resource):
                     session.session_id = session_id
                     db.session.add(session)
                     db.session.commit()
-                    
+
                     response = "CON Congz You are on level 12"
                     return respond(response)
 
